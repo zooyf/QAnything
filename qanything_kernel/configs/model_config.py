@@ -189,6 +189,10 @@ LOCAL_OCR_SERVICE_URL = "localhost:7001"
 
 LOCAL_PDF_PARSER_SERVICE_URL = "localhost:9009"
 
+# Timeout settings for dependent services (seconds)
+OCR_TIMEOUT_SECONDS = int(os.getenv("OCR_TIMEOUT_SECONDS", "300"))
+PDF_PARSER_TIMEOUT_SECONDS = int(os.getenv("PDF_PARSER_TIMEOUT_SECONDS", "300"))
+
 LOCAL_RERANK_SERVICE_URL = "localhost:8001"
 LOCAL_RERANK_MODEL_NAME = 'rerank'
 LOCAL_RERANK_MAX_LENGTH = 512

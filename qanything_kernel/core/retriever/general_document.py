@@ -1,8 +1,16 @@
 from qanything_kernel.utils.general_utils import get_time, get_table_infos, num_tokens_embed, get_all_subpages, \
     html_to_markdown, clear_string, get_time_async
 from typing import List, Optional
-from qanything_kernel.configs.model_config import UPLOAD_ROOT_PATH, LOCAL_OCR_SERVICE_URL, IMAGES_ROOT_PATH, \
-    DEFAULT_CHILD_CHUNK_SIZE, LOCAL_PDF_PARSER_SERVICE_URL, SEPARATORS
+from qanything_kernel.configs.model_config import (
+    UPLOAD_ROOT_PATH,
+    LOCAL_OCR_SERVICE_URL,
+    IMAGES_ROOT_PATH,
+    DEFAULT_CHILD_CHUNK_SIZE,
+    LOCAL_PDF_PARSER_SERVICE_URL,
+    SEPARATORS,
+    OCR_TIMEOUT_SECONDS,
+    PDF_PARSER_TIMEOUT_SECONDS,
+)
 from langchain.docstore.document import Document
 from qanything_kernel.utils.loader.my_recursive_url_loader import MyRecursiveUrlLoader
 from qanything_kernel.utils.custom_log import insert_logger
@@ -35,7 +43,11 @@ import time
 
 def get_ocr_result_sync(image_data):
     try:
-        response = requests.post(f"http://{LOCAL_OCR_SERVICE_URL}/ocr", data=image_data, timeout=120)
+        response = requests.post(
+            f"http://{LOCAL_OCR_SERVICE_URL}/ocr",
+            data=image_data,
+            timeout=OCR_TIMEOUT_SECONDS,
+        )
         response.raise_for_status()  # 如果请求返回了错误状态码，将会抛出异常
         ocr_res = response.text
         ocr_res = json.loads(ocr_res)
@@ -51,8 +63,12 @@ def get_pdf_result_sync(file_path):
             'save_dir': os.path.dirname(file_path)
         }
         headers = {"content-type": "application/json"}
-        response = requests.post(f"http://{LOCAL_PDF_PARSER_SERVICE_URL}/pdfparser", json=data, headers=headers,
-                                 timeout=240)
+        response = requests.post(
+            f"http://{LOCAL_PDF_PARSER_SERVICE_URL}/pdfparser",
+            json=data,
+            headers=headers,
+            timeout=PDF_PARSER_TIMEOUT_SECONDS,
+        )
         response.raise_for_status()  # 如果请求返回了错误状态码，将会抛出异常
         response_json = response.json()
         markdown_file = response_json.get('markdown_file')
